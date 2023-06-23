@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:test_app/bloc/todo_bloc.dart';
+import 'package:test_app/event/add_todo_event.dart';
 
 import '../models/item.dart';
 
@@ -20,11 +23,11 @@ class _ModelButtonState extends State<ModelButton> {
   var date = DateTime.now();
 
   void _handleSubmitted(BuildContext context) {
-    final name = controller.text;
-    if (name.isEmpty) {
+    final content = controller.text;
+    if (content.isEmpty) {
       return;
     }
-    widget.addTask(name, date);
+    widget.addTask(content, date);
 
     Navigator.of(context).pop();
   }
@@ -63,6 +66,7 @@ class _ModelButtonState extends State<ModelButton> {
 
   @override
   Widget build(BuildContext context) {
+    var bloc = Provider.of<TodoBloc>(context, listen: false);
     return Padding(
       padding: MediaQuery.of(context).viewInsets,
       child: SingleChildScrollView(
@@ -70,6 +74,11 @@ class _ModelButtonState extends State<ModelButton> {
         // color: Colors.white,
         child: Column(
           children: [
+            const Text(
+              'Thêm công việc',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
             TextField(
               controller: controller,
               decoration: const InputDecoration(
@@ -96,7 +105,7 @@ class _ModelButtonState extends State<ModelButton> {
                       child: Text(
                         DateFormatter(date.toString())
                             .format('HH:mm dd-MM-yyyy'),
-                        style: const TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 20),
                       ),
                     )),
               )),
@@ -106,7 +115,11 @@ class _ModelButtonState extends State<ModelButton> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                  onPressed: () => _handleSubmitted(context),
+                  onPressed: () {
+                    // _handleSubmitted(context);
+                    bloc.event.add(AddTodoEvent(controller.text, date));
+                    Navigator.of(context).pop();
+                  },
                   child: const Text('Thêm công việc')),
             )
           ],
